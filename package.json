@@ -9,6 +9,10 @@
   "author": "berkhel",
   "license": "MIT",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/berkhel/json-wrapper.git"
+  },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
     "async": "^3.2.5",
