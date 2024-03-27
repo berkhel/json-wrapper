@@ -115,5 +115,18 @@ Enrich a json object with behaviour from a class object.
       }
   }
 ----
-  
+
+== Methods
+
+=== Static methods
+
+* fromJsonString(string)
+
+* fromJsonObject(object)
+
+=== Instance methods
+
+* toJsonString()
+
+* toJsonObject()
  
