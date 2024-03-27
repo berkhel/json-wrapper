@@ -9,6 +9,11 @@
   "author": "berkhel",
   "license": "MIT",
   "type": "module",
+  "keywords" : [
+    "json",
+    "class",
+    "json-schema"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/berkhel/json-wrapper.git"
