@@ -1,24 +1,20 @@
 {
-  "name": "node_tests",
+  "name": "json-wrapper",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A wrapper class to encapsulate json objects",
+  "main": "classes.js",
   "scripts": {
     "test": "node --stack-size=3000 spec/support/jasmine-runner.js"
   },
-  "author": "mimmo",
-  "license": "ISC",
+  "author": "berkhel",
+  "license": "MIT",
   "type": "module",
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
     "async": "^3.2.5",
     "chance": "^1.1.11",
-    "class-transformer": "^0.5.1",
-    "deepmerge": "^4.3.1",
-    "jackson-js": "^1.1.0",
     "json-schema-faker": "^0.5.6",
     "lodash": "^4.17.21",
-    "reflect-metadata": "^0.2.1",
     "traverse": "^0.6.8"
   },
   "devDependencies": {
