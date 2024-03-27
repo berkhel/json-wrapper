@@ -1,4 +1,3 @@
-
 import _ from 'lodash'
 import { JSONSchemaFaker as JsonGenerator } from 'json-schema-faker'
 import traverse from 'traverse'
