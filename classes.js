@@ -18,7 +18,7 @@ import traverse from 'traverse'
  *  in the static referencedClasses field all the referenced classes
  * 
  * @example //simple usage
- * class User extends JsonWrapper {
+ * class User extends JSONWrapper {
  *  static schema = {"type" : "object", "properties" : {
  *   "first_name" : {"type":"string"},
  *   "last_name" : {"type":"string"}}}
@@ -30,16 +30,16 @@ import traverse from 'traverse'
  * console.log(aUser.getFullname()) //prints "John Doe"
  * 
  * @example //nested usage
- * class App extends JsonWrapper {
+ * class App extends JSONWrapper {
  *      static schema = {"type":"object","properties":{
  * "users":{"type":"array","items":{"$ref":"User"}}}}
  *      static referencedClasses = [User]
  * }
- * class User extends JsonWrapper {
+ * class User extends JSONWrapper {
  * static schema = {"type":"object","properties":{"country":{"$ref":"Country"}}}
  *     static referencedClasses = [Country]
  * }
- * class Country extends JsonWrapper {
+ * class Country extends JSONWrapper {
  * static schema = {"type" :"object","properties":{"language":{"type":"string"},"code":{"type":"string"}}}
  *      get locale() {
  *          return this.language + "_" + this.code
@@ -56,7 +56,7 @@ import traverse from 'traverse'
  * console.log(app.users[0].country.locale) //prints "it_IT"
  * 
  * @example //constructor that doesn't respect the contract 
- * class User extends JsonWrapper {
+ * class User extends JSONWrapper {
  * //schema and classReferenced omitted
  *      constructor(name) {
  *          super();
@@ -66,7 +66,7 @@ import traverse from 'traverse'
  * }
  * 
  * @example //class that doesn't respect the contract due to the nested object constructor
- * class User extends JsonWrapper {
+ * class User extends JSONWrapper {
  * //schema omitted
  * static referencedClasses = [Country]
  * }
@@ -78,7 +78,7 @@ import traverse from 'traverse'
  * }
  * 
  */
-export class JsonWrapper {
+export class JSONWrapper {
 
     static schema = {}
     static referencedClasses = []
@@ -140,7 +140,7 @@ export class JsonWrapper {
     /**
      * Factory method
      * @param {string} json - a json string compatible with the class from which this method is called
-     * @returns {JsonWrapper} an instance of the class from which this method is called
+     * @returns {JSONWrapper} an instance of the class from which this method is called
      */
     static fromJsonString(json) {
         return this.fromJsonObject(JSON.parse(json))
@@ -149,11 +149,11 @@ export class JsonWrapper {
     /**
      * Factory method
      * @param {string} jsonObj - a json object compatible with the class from which this method is called
-     * @returns {JsonWrapper} an instance of the class from which this method is called
+     * @returns {JSONWrapper} an instance of the class from which this method is called
      */
     static fromJsonObject(jsonObj) {
-        JsonWrapper.#configureGenerator()
-        return JsonWrapper.#jsonObjectToClassObject(jsonObj, this.prototype.constructor)
+        JSONWrapper.#configureGenerator()
+        return JSONWrapper.#jsonObjectToClassObject(jsonObj, this.prototype.constructor)
     }
 
     /**
@@ -178,14 +178,14 @@ export class JsonWrapper {
      */
     static #jsonObjectToClassObject(jsonObject, constructor) {
         let tempObj = constructor.minimalObject?.() || new constructor()
-        let res = _.mergeWith(tempObj, jsonObject, JsonWrapper.#handleObjects);
+        let res = _.mergeWith(tempObj, jsonObject, JSONWrapper.#handleObjects);
         return res 
     }
 
 
     /**
      * @private
-     * @param {Object} classObjArray - array at some point in the state structure of the JsonWrapper object
+     * @param {Object} classObjArray - array at some point in the state structure of the JSONWrapper object
      * @param {Object} jsonObjArray - corresponding array of {@link classObjArray} in the json object
      * @returns {(Array.<Array> | Array.<Object> | undefined)}
      */
@@ -197,8 +197,8 @@ export class JsonWrapper {
         const isArrayOfArrays = it => _.isArray(it) && _.isArray(it[0])
         if (_.isArray(jsonObjArray) && isArrayOfObjects(classObjArray)) {
             return jsonObjArray.map(isArrayOfArrays(classObjArray) ?
-                jsonObjArrayElem => JsonWrapper.#handleObjects(classObjArray[0], jsonObjArrayElem) :
-                jsonObjArrayElem => JsonWrapper.#jsonObjectToClassObject(jsonObjArrayElem, classObjArray[0].constructor)
+                jsonObjArrayElem => JSONWrapper.#handleObjects(classObjArray[0], jsonObjArrayElem) :
+                jsonObjArrayElem => JSONWrapper.#jsonObjectToClassObject(jsonObjArrayElem, classObjArray[0].constructor)
             )
         }
     }

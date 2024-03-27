@@ -1,10 +1,10 @@
 
-import { JsonWrapper } from "../../classes.js"
+import { JSONWrapper } from "../../classes.js"
 import fs from 'fs'
 import path from 'path'
 import { Fake } from "../fixtures/util/fake.js"
 
-class Pair extends JsonWrapper{
+class Pair extends JSONWrapper{
 
     static schema = {
         "id" : "Pair",
@@ -24,7 +24,7 @@ class Pair extends JsonWrapper{
     }
 }
 
- class Letter extends JsonWrapper {
+ class Letter extends JSONWrapper {
 
     static schema = {
         "id" : "Letter",
@@ -41,7 +41,7 @@ class Pair extends JsonWrapper{
     }
 }
 
- class Credential extends JsonWrapper {
+ class Credential extends JSONWrapper {
 
     static schema = {
         "id" : "Credential",
@@ -79,7 +79,7 @@ class Pair extends JsonWrapper{
     }
 }
 
- class User extends JsonWrapper{
+ class User extends JSONWrapper{
 
     static schema = {
         "id" : "User",
@@ -112,7 +112,7 @@ class Pair extends JsonWrapper{
 
 }
 
- class Product extends JsonWrapper{
+ class Product extends JSONWrapper{
     static schema = {
         "id" : "Product",
         "type": "object",
@@ -125,7 +125,7 @@ class Pair extends JsonWrapper{
     uid = "98765"
 }
 
-class Door extends JsonWrapper{
+class Door extends JSONWrapper{
     static schema = {
         "id" : "Door",
         "type" : "object",
@@ -139,7 +139,7 @@ class Door extends JsonWrapper{
     }
 }
 
-class House extends JsonWrapper {
+class House extends JSONWrapper {
     static schema = {
         "id" : "House",
         "type" : "object",
@@ -153,7 +153,7 @@ class House extends JsonWrapper {
 }
 
 
- class Recursive extends JsonWrapper {
+ class Recursive extends JSONWrapper {
 
     static schema  = {
         "id" : "Recursive",
