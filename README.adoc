@@ -10,9 +10,14 @@ Enrich a json object with behaviour from a class object.
 [,javascript]
 ----
  class User extends JSONWrapper {
-  static schema = {"type" : "object", "properties" : {
-   "first_name" : {"type":"string"},
-   "last_name" : {"type":"string"}}}
+  static schema = {
+   "id" : "User",
+   "type" : "object",
+   "properties" : {
+     "first_name" : {"type":"string"},
+     "last_name" : {"type":"string"}
+   }
+ }
   getFullname(){
     return this.first_name + " " + this.last_name
   }    
@@ -25,20 +30,53 @@ Enrich a json object with behaviour from a class object.
 [,javascript]
 ----
  class App extends JSONWrapper {
-     static schema = {"type":"object","properties":{
-       "users":{"type":"array","items":{"$ref":"User"}}}}
+     static schema = {
+       "id" : "App",
+       "type" : "object",
+       "properties" : {
+          "users" : {
+            "type" : "array",
+            "items" : {
+              "$ref":"User"
+            }
+          }
+        }
+      }
+
      static referencedClasses = [User]
  }
+
  class User extends JSONWrapper {
-    static schema = {"type":"object","properties":{"country":{"$ref":"Country"}}}
+    static schema = {
+      "id" : "User",
+      "type" : "object",
+      "properties" : {
+        "country" : { 
+          "$ref" : "Country" 
+         }
+       }
+      }
     static referencedClasses = [Country]
  }
  class Country extends JSONWrapper {
-   static schema = {"type" :"object","properties":{"language":{"type":"string"},"code":{"type":"string"}}}
+   static schema = {
+     "type" : "object",
+     "properties" : {
+       "language" : {
+       "type" : "string" 
+      },
+      "code" : {
+         "type":"string"
+      }
+     }
+    }
+
     get locale() {
       return this.language + "_" + this.code
     }
+
  }
+
  let app = App.fromJsonString(`{
    users : [{
       first_name: "John",
@@ -46,11 +84,13 @@ Enrich a json object with behaviour from a class object.
       country: {
           language : "it"
           code : "IT"
-       }}]}`)
+       }
+      }]
+  }`)
   console.log(app.users[0].country.locale) //prints "it_IT"
- ---- 
+---- 
 
- === constructors that doesn't respect the contract
+=== constructors that doesn't respect the contract
 
 [,javascript]
 ----
