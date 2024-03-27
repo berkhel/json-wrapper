@@ -114,12 +114,21 @@ class JSONWrapper {
         return this._markedSchema
     }
 
-    static minimalObject()  {
+
+    static get modelInstance(){
+        if(!this._instance){
+            this._instance = new this.prototype.constructor()
+        }
+        return this._instance
+    }
+
+    static minimalObject(jsonObject)  {
 
         
         const classReferences = [this].concat(this.referencedClasses)
+        const modelInstance = this.modelInstance
 
-        const replace$classMarkersWithClassInstances = (node) => {
+        const replace$classMarkersWithClassInstances = (node, inst) => {
             function replaceMarked(entry, withClass) {
                 delete entry.$class
                 return _.merge(new withClass.prototype.constructor(), entry);
@@ -129,9 +138,14 @@ class JSONWrapper {
         }
 
         function markersToClassObjects(node){
-            if(node["$class"]) this.update(replace$classMarkersWithClassInstances(node))
+            if(!traverse(jsonObject).has(this.path) && !traverse(modelInstance).has(this.path)){
+                this.delete()
+            }else if(node["$class"]) this.update(replace$classMarkersWithClassInstances(node))
         }
 
+        
+
+        
         return traverse(JsonGenerator.generate(this.markedSchema)).map(markersToClassObjects)
 
     }
@@ -178,7 +192,7 @@ class JSONWrapper {
      * @returns {T} an instance of type T containing deep copied data from jsonObject
      */
     static #jsonObjectToClassObject(jsonObject, constructor) {
-        let tempObj = constructor.minimalObject?.() || new constructor()
+        let tempObj = constructor.minimalObject?.(jsonObject) || new constructor()
         let res = _.mergeWith(tempObj, jsonObject, JSONWrapper.#handleObjects);
         return res 
     }
@@ -192,7 +206,7 @@ class JSONWrapper {
      */
     static #handleObjects(classObjArray, jsonObjArray) {
         if(_.isObject(classObjArray) && !_.isArray(classObjArray)){
-            return _.merge(classObjArray.constructor.minimalObject?.() || new classObjArray.constructor(), jsonObjArray)
+            return _.merge(classObjArray.constructor.minimalObject?.(jsonObjArray) || new classObjArray.constructor(), jsonObjArray)
         }
         const isArrayOfObjects = it => _.isArray(it) && _.isObject(it[0])
         const isArrayOfArrays = it => _.isArray(it) && _.isArray(it[0])

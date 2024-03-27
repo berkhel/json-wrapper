@@ -90,6 +90,23 @@ class Pair extends JSONWrapper{
                 "items" : {
                     "$ref" : "Credential"
                 }
+            },
+            "firstName" : {
+                "type" : "string"
+            },
+            "lastName" : {
+                "type" : "string"
+            },
+            "address": {
+                "type" : "object",
+                "properties" : {
+                    "street" : {
+                        "type" : "string"
+                    },
+                    "city" : {
+                        "type" : "string"
+                    }
+                }
             }
         }
     }
@@ -185,10 +202,17 @@ class House extends JSONWrapper {
 let request = fs.readFileSync(path.resolve('./spec/fixtures/resources/sample-request.json'))
 
 describe("----UNIT TESTS----\n", () => {
-    describe("Nested immediate class",() => {
+    describe("Nested immediate class objects",() => {
         it("should expose working methods",() => {
             let aHouse = House.fromJsonString('{"door":{"name":"White"}}')
             expect(aHouse.door.ring()).toBe("dlin dlon!")
+        })
+    })
+    describe("A class object instantiate with a json smaller than its schema",() => {
+        it("shouldn't change the json data structure", () => {
+            let json = {"firstName": "Rico", "lastName": "Suarez"}
+            let aUser = User.fromJsonObject(json)
+            expect(aUser.toJsonObject()).toEqual(json)
         })
     })
     describe("", () => {
@@ -298,17 +322,18 @@ describe("----UNIT TESTS----\n", () => {
 
 describe("----INTEGRATION TESTS----\n", () => {
         describe("Minimal object",() => {
+            let json = {"credentials": [{"numberPairs" : [{}], "matrix": [[{}]]}]} 
 
             it("should call constructors of the top class once", () => {
                 let constructorUser = spyOn(User.prototype,'constructor').and.callThrough()
-                let minimalUser = User.minimalObject()
+                let minimalUser = User.minimalObject(json, new User())
                 expect(constructorUser).toHaveBeenCalledTimes(1)
                 constructorUser.calls.reset()
 
             })
             it("should call constructors of referenced classes once", () => {
                 let constructorCred = spyOn(Credential.prototype,'constructor').and.callThrough()
-                let minimalUser = User.minimalObject()
+                let minimalUser = User.minimalObject(json,new User())
                 expect(constructorCred).toHaveBeenCalledTimes(1)
                 constructorCred.calls.reset()
 
@@ -316,7 +341,7 @@ describe("----INTEGRATION TESTS----\n", () => {
             it("shouldn't call constructors of referenced classes of referenced classes", () => {
                 let constructorPair = spyOn(Pair.prototype,'constructor').and.callThrough()
                 let constructorLett = spyOn(Letter.prototype,'constructor').and.callThrough()
-                let minimalUser = User.minimalObject()
+                let minimalUser = User.minimalObject(json, new User())
                 expect(constructorPair).not.toHaveBeenCalled()
                 expect(constructorLett).not.toHaveBeenCalled()
                 constructorPair.calls.reset()
