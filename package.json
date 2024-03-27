@@ -2,14 +2,13 @@
   "name": "json-wrapper",
   "version": "1.0.1",
   "description": "A wrapper class to encapsulate json objects",
-  "main": "classes.js",
+  "main": "index.js",
   "scripts": {
     "test": "node --stack-size=3000 spec/support/jasmine-runner.js"
   },
   "author": "berkhel",
   "license": "MIT",
-  "type": "module",
-  "keywords" : [
+  "keywords": [
     "json",
     "class",
     "json-schema"

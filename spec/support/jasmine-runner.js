@@ -1,6 +1,7 @@
-import Jasmine from 'jasmine'
+'use strict'
+const Jasmine = require('jasmine')
 const runner = new Jasmine();
-import { SpecReporter, DisplayProcessor, StacktraceOption } from 'jasmine-spec-reporter'
+const { SpecReporter, DisplayProcessor, StacktraceOption } = require('jasmine-spec-reporter')
 
 
 class CustomProcessor extends DisplayProcessor {
@@ -37,8 +38,10 @@ runner.loadConfigFile('spec/support/jasmine.json')
 runner.configureDefaultReporter({ print: function () {} })// turn off default reporter output
 runner.addReporter(customReporter)
 runner.exitOnCompletion = false; //allow execute() to return a Promise
-const result = await runner.execute();
-
+async function exec(){
+    return await runner.execute();
+}
+const result = exec();
 if (result.overallStatus === 'passed') {
     console.log('\x1b[32m%s\x1b[0m', 'All specs have passed.');
 } else {

@@ -1,19 +1,5 @@
-import { JsonWrapper } from "./classes.js";
+'use strict'
 
-class A extends JsonWrapper {
-    static schema = {
-        "id" : "A",
-        "type" : "object",
-        "properties" : {
-            "order": "number"
-        }
-    }
+const JSONWrapper = require('./classes');
 
-    doubleOrder(){
-        return this.order * 2
-    }
-}
-
-let a = A.fromJsonObject({ "order" : 4})
-
-console.log(a.doubleOrder())
+module.exports =  JSONWrapper;

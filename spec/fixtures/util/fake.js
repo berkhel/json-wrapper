@@ -1,10 +1,10 @@
-import { JSONSchemaFaker } from 'json-schema-faker'
-import { faker } from "@faker-js/faker";
-import Chance from "chance";
-JSONSchemaFaker.extend("faker", () => faker);
-JSONSchemaFaker.extend("chance", () => new Chance());
+const { JSONSchemaFaker } = require('json-schema-faker')
+//import { faker } from "@faker-js/faker";
+//import Chance from "chance";
+//JSONSchemaFaker.extend("faker", () => faker);
+//JSONSchemaFaker.extend("chance", () => new Chance());
 
-export class Fake {
+class Fake {
     static jsonStringFromClass(constructor, properties, options) {
         
         let schema = {
@@ -18,3 +18,5 @@ export class Fake {
         return JSON.stringify(JSONSchemaFaker.generate(schema))
     }
 }
+
+module.exports = Fake

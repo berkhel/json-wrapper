@@ -1,8 +1,8 @@
 
-import { JSONWrapper } from "../../classes.js"
-import fs from 'fs'
-import path from 'path'
-import { Fake } from "../fixtures/util/fake.js"
+const JSONWrapper = require("../../")
+const fs = require('fs')
+const path = require('path')
+const Fake = require("../fixtures/util/fake.js")
 
 class Pair extends JSONWrapper{
 

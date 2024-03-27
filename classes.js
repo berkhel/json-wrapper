@@ -1,6 +1,7 @@
-import _ from 'lodash'
-import { JSONSchemaFaker as JsonGenerator } from 'json-schema-faker'
-import traverse from 'traverse'
+'use strict'
+const _ = require('lodash')
+const JsonGenerator = require('json-schema-faker').JSONSchemaFaker
+const traverse = require('traverse')
 
 /**
  * 
@@ -78,7 +79,7 @@ import traverse from 'traverse'
  * }
  * 
  */
-export class JSONWrapper {
+class JSONWrapper {
 
     static schema = {}
     static referencedClasses = []
@@ -203,3 +204,5 @@ export class JSONWrapper {
         }
     }
 }
+
+module.exports = JSONWrapper
