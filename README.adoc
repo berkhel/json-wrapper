@@ -1,7 +1,11 @@
 = JSON WRAPPER
 
-
 Enrich a json object with the behavior of a class object.
+
+== Usage
+. create a new class and **extends JSONWrapper**
+. set **static schema**, it must be a valid json schema (see link:https://json-schema.org[Json-Schema]).
+. (Optional) set **static referencedClasses**, if you want to reference other classes with "$ref".
 
 == Examples 
 
