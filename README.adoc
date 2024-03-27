@@ -1,7 +1,7 @@
-= json-wrapper
+= JSON WRAPPER
 
 
-Enrich a json object with behaviour from a class object.
+Enrich a json object with the behavior of a class object.
 
 == Examples 
 
