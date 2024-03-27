@@ -1,0 +1,36 @@
+{
+  "message": "Welcome message",
+    "firstName": "John",
+    "lastName": "Doe",
+    "address": {
+      "city": "London",
+      "street": "221b Baker Street"
+    },
+  "credentials": [
+    {
+      "username": "Gion",
+      "password": "jfkdjfk",
+      "numberPairs": [
+        {"firstNumber": 5, "secondNumber": 6},
+        {"firstNumber": 7, "secondNumber": 10}
+      ],
+      "matrix": [
+        [{"label": "a"}, {"label": "b"}],
+        [{"label": "c"}, {"label": "d"}]
+      ]
+    },
+    {
+      "username": "Jonny",
+      "password": "qiqooqio",
+      "numberPairs": [
+        {"firstNumber": 7, "secondNumber": 13},
+        {"firstNumber": 10, "secondNumber": 16}
+      ],
+      "matrix": [
+        [{"label": "e"}, {"label": "f"}, {"label": "g"}],
+        [{"label": "h"}, {"label": "i"}, {"label": "j"}],
+        [{"label": "k"}, {"label": "l"}, {"label": "m"}]
+      ]
+    }
+  ]
+}
