@@ -1,6 +1,6 @@
 {
   "name": "json-wrapper",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A wrapper class to encapsulate json objects",
   "main": "index.js",
   "scripts": {
