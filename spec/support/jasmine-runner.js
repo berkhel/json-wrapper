@@ -14,7 +14,7 @@ const customReporter = new SpecReporter({
     spec: {
         displayDuration: true,
         displayErrorMessages: true,
-       // displayStacktrace: StacktraceOption.PRETTY,
+        displayStacktrace: StacktraceOption.PRETTY,
         displaySuccessful: true,
         displayFailed: true,
         displayPending: false

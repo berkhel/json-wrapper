@@ -1,4 +1,4 @@
-'use strict'
+const assert = require('node:assert').strict
 const _ = require('lodash')
 const JsonGenerator = require('json-schema-faker').JSONSchemaFaker
 const traverse = require('traverse')
@@ -84,6 +84,10 @@ class JSONWrapper {
     static schema = {}
     static referencedClasses = []
 
+    static {
+        JSONWrapper.#configureGenerator()
+    }
+
 
     static #configureGenerator() {
         JsonGenerator.option({
@@ -167,7 +171,6 @@ class JSONWrapper {
      * @returns {JSONWrapper} an instance of the class from which this method is called
      */
     static fromJsonObject(jsonObj) {
-        JSONWrapper.#configureGenerator()
         return JSONWrapper.#jsonObjectToClassObject(jsonObj, this.prototype.constructor)
     }
 
@@ -200,21 +203,18 @@ class JSONWrapper {
 
     /**
      * @private
-     * @param {Object} classObjArray - array at some point in the state structure of the JSONWrapper object
-     * @param {Object} jsonObjArray - corresponding array of {@link classObjArray} in the json object
+     * @param {Object} classObjNode - array at some point in the state structure of the JSONWrapper object
+     * @param {Object} jsonObjNode - corresponding array of {@link classObjNode} in the json object
      * @returns {(Array.<Array> | Array.<Object> | undefined)}
      */
-    static #handleObjects(classObjArray, jsonObjArray) {
-        if(_.isObject(classObjArray) && !_.isArray(classObjArray)){
-            return _.merge(classObjArray.constructor.minimalObject?.(jsonObjArray) || new classObjArray.constructor(), jsonObjArray)
+    static #handleObjects(classObjNode, jsonObjNode) {
+        if(classObjNode instanceof JSONWrapper && !_.isArray(classObjNode)){
+            return JSONWrapper.#jsonObjectToClassObject(jsonObjNode, classObjNode.constructor)
         }
-        const isArrayOfObjects = it => _.isArray(it) && _.isObject(it[0])
-        const isArrayOfArrays = it => _.isArray(it) && _.isArray(it[0])
-        if (_.isArray(jsonObjArray) && isArrayOfObjects(classObjArray)) {
-            return jsonObjArray.map(isArrayOfArrays(classObjArray) ?
-                jsonObjArrayElem => JSONWrapper.#handleObjects(classObjArray[0], jsonObjArrayElem) :
-                jsonObjArrayElem => JSONWrapper.#jsonObjectToClassObject(jsonObjArrayElem, classObjArray[0].constructor)
-            )
+        if(_.isArray(classObjNode) && _.isArray(jsonObjNode)){
+            assert(_.isArray(jsonObjNode),"not array"+JSON.stringify(jsonObjNode)) 
+            return jsonObjNode.map(jsonObjNodeElem =>
+                 JSONWrapper.#handleObjects(classObjNode[0], jsonObjNodeElem) )
         }
     }
 }
