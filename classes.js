@@ -89,78 +89,6 @@ class JSONWrapper {
     }
 
 
-    static #configureGenerator() {
-        JsonGenerator.option({
-            "refDepthMax": "0",
-            "minItems": "1",
-            "maxItems": "1",
-            "requiredOnly": true,
-            "omitNulls": false
-        })
-    }
-
-    static get markedSchema() {
-        if (!this._markedSchema) {
-            let schema = _.cloneDeep(this.schema)
-            schema.properties["$class"] = { "enum": [this.name] }
-            traverse(schema).forEach(function (node) {
-                if (node["$ref"]) {
-                    this.update({ "$class": { "enum": [node["$ref"]] } })
-                }
-            })
-            schema.required = ["$class"]
-                .concat(this.schema?.required || [])
-                .concat(Object.entries(schema.properties)
-                    .filter(([, value]) => value["$class"] || value.type === "object" || value.type === "array")
-                    .map(([key, ]) => key))
-            this._markedSchema = schema;
-        }
-        return this._markedSchema
-    }
-
-
-    static get modelInstance(){
-        if(!this._instance){
-            this._instance = new this.prototype.constructor()
-        }
-        return this._instance
-    }
-
-    static minimalObject(jsonObject)  {
-
-        
-        const classReferences = [this].concat(this.referencedClasses)
-        const modelInstance = this.modelInstance
-
-        const replace$classMarkersWithClassInstances = (node) => {
-            const foundClass = classReferences.find(cls => cls.name === node["$class"])
-            return foundClass? replaceMarkedNode(foundClass) : node
-            function replaceMarkedNode(withClass) {
-                delete node.$class
-                return _.merge(new withClass.prototype.constructor(), node);
-            }
-        }
-
-        function toClassObject(node){
-            if(isNotUsed(this.path)) {this.delete(); return}
-            if(node.hasOwnProperty("$class")) this.update(replace$classMarkersWithClassInstances(node))
-        }
-
-        function isNotUsed(nodePath){
-            if(!traverse(jsonObject).has(nodePath) && !traverse(modelInstance).has(nodePath)){
-                return true
-            }
-        }
-
-        
-
-        
-        return traverse(JsonGenerator.generate(this.markedSchema)).map(toClassObject)
-
-    }
-
-
-
     /**
      * Factory method
      * @param {string} json - a json string compatible with the class from which this method is called
@@ -209,6 +137,72 @@ class JSONWrapper {
                  JSONWrapper.#handleObjects(classObjNode[0], jsonObjNodeElem) )
         }
     }
+
+    static #configureGenerator() {
+        JsonGenerator.option({
+            "refDepthMax": "0",
+            "minItems": "1",
+            "maxItems": "1",
+            "requiredOnly": true,
+            "omitNulls": false
+        })
+    }
+
+    static get markedSchema() {
+        if (!this._markedSchema) {
+            let schema = _.cloneDeep(this.schema)
+            schema.properties["$class"] = { "enum": [this.name] }
+            traverse(schema).forEach(function (node) {
+                if (node["$ref"]) {
+                    this.update({ "$class": { "enum": [node["$ref"]] } })
+                }
+            })
+            schema.required = ["$class"]
+                .concat(this.schema?.required || [])
+                .concat(Object.entries(schema.properties)
+                    .filter(([, value]) => value["$class"] || value.type === "object" || value.type === "array")
+                    .map(([key, ]) => key))
+            this._markedSchema = schema;
+        }
+        return this._markedSchema
+    }
+
+    static get modelInstance(){
+        if(!this._instance){
+            this._instance = new this.prototype.constructor()
+        }
+        return this._instance
+    }
+
+    static minimalObject(jsonObject)  {
+        
+        const classReferences = [this].concat(this.referencedClasses)
+        const modelInstance = this.modelInstance
+
+        const replace$classMarkersWithClassInstances = (node) => {
+            const foundClass = classReferences.find(cls => cls.name === node["$class"])
+            return foundClass? replaceMarkedNode(foundClass) : node
+            function replaceMarkedNode(withClass) {
+                delete node.$class
+                return _.merge(new withClass.prototype.constructor(), node);
+            }
+        }
+
+        function toClassObject(node){
+            if(isNotUsed(this.path)) {this.delete(); return}
+            if(node.hasOwnProperty("$class")) this.update(replace$classMarkersWithClassInstances(node))
+        }
+
+        function isNotUsed(nodePath){
+            if(!traverse(jsonObject).has(nodePath) && !traverse(modelInstance).has(nodePath)){
+                return true
+            }
+        }
+
+        return traverse(JsonGenerator.generate(this.markedSchema)).map(toClassObject)
+
+    }
+
 }
 
 module.exports = JSONWrapper
