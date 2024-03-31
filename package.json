@@ -23,6 +23,9 @@
     "traverse": "^0.6.8"
   },
   "devDependencies": {
+    "@stylistic/eslint-plugin-js": "^1.7.0",
+    "eslint": "^8.57.0",
+    "eslint-config-google": "^0.14.0",
     "jasmine": "^5.1.0",
     "jasmine-spec-reporter": "^7.0.0"
   }
