@@ -39,6 +39,7 @@ class User extends JSONWrapper {
         return this.first_name + " " + this.last_name
     }    
 }
+
 let aUser = User.fromJsonString( "{first_name: \"John\", last_name: \"Doe\"}" )
 console.log( aUser.getFullname() ) //prints "John Doe"
 ----
@@ -59,7 +60,6 @@ class App extends JSONWrapper {
             }
         }
     }
-
     static referencedClasses = [User]
 }
 
@@ -75,6 +75,7 @@ class User extends JSONWrapper {
     }
     static referencedClasses = [Country]
 }
+
 class Country extends JSONWrapper {
     static schema = {
         "type" : "object",
@@ -87,11 +88,9 @@ class Country extends JSONWrapper {
             }
         }
     }
-
     get locale() {
         return this.language + "_" + this.code
     }
-
 }
 
 let app = App.fromJsonString( `{
@@ -107,7 +106,7 @@ let app = App.fromJsonString( `{
 console.log( app.users[0].country.locale ) //prints "it_IT"
 ---- 
 
-=== constructors that doesn't respect the contract
+=== Constructors that doesn't respect the contract
 
 [,javascript]
 ----
@@ -125,6 +124,7 @@ class User extends JSONWrapper {
     //schema omitted
     static referencedClasses = [Country]
 }
+
 class Country {
     constructor( countryCode ) { 
         if( !countryCode ) throw Error()
