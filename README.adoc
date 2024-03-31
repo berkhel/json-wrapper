@@ -45,7 +45,8 @@ console.log( aUser.getFullname() ) //prints "John Doe"
 
 === nested usage
 [,javascript]
-----class App extends JSONWrapper {
+----
+class App extends JSONWrapper {
     static schema = {
         "id" : "App",
         "type" : "object",
