@@ -38,12 +38,11 @@ runner.loadConfigFile('spec/support/jasmine.json')
 runner.configureDefaultReporter({ print: function () {} })// turn off default reporter output
 runner.addReporter(customReporter)
 runner.exitOnCompletion = false; //allow execute() to return a Promise
-async function exec(){
-    return await runner.execute();
-}
-const result = exec();
-if (result.overallStatus === 'passed') {
-    console.log('\x1b[32m%s\x1b[0m', 'All specs have passed.');
-} else {
-    console.log('\x1b[31m%s\x1b[0m', 'At least one spec has failed.');
-}
+(async function exec() {
+    const result = await runner.execute();
+    if (result.overallStatus === 'passed') {
+        console.log('\x1b[32m%s\x1b[0m', 'All specs have passed.');
+    } else {
+        console.log('\x1b[31m%s\x1b[0m', 'At least one spec has failed.');
+    }
+})()

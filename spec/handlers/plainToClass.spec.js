@@ -4,61 +4,61 @@ const fs = require('fs')
 const path = require('path')
 const Fake = require("../fixtures/util/fake.js")
 
-class Pair extends JSONWrapper{
+class Pair extends JSONWrapper {
 
     static schema = {
-        "id" : "Pair",
-        "type" : "object",
-        "properties" : {
-            "firstNumber" : {
-                "type" : "number" 
+        "id": "Pair",
+        "type": "object",
+        "properties": {
+            "firstNumber": {
+                "type": "number"
             },
-            "secondNumber" : {
-                "type" : "number" 
+            "secondNumber": {
+                "type": "number"
             }
         }
     }
 
-    sum (){
+    sum() {
         return this.firstNumber + this.secondNumber;
     }
 }
 
- class Letter extends JSONWrapper {
+class Letter extends JSONWrapper {
 
     static schema = {
-        "id" : "Letter",
-        "type" : "object",
-        "properties" : {
-            "label" : {
-                "type" : "string"
+        "id": "Letter",
+        "type": "object",
+        "properties": {
+            "label": {
+                "type": "string"
             }
         }
     }
 
-    toUpper (){
+    toUpper() {
         return this.label.toUpperCase()
     }
 }
 
- class Credential extends JSONWrapper {
+class Credential extends JSONWrapper {
 
     static schema = {
-        "id" : "Credential",
-        "type" : "object",
-        "properties" : {
-            "numberPairs" : {
-                "type" : "array",
-                "items" : {
-                    "$ref" : "Pair"
+        "id": "Credential",
+        "type": "object",
+        "properties": {
+            "numberPairs": {
+                "type": "array",
+                "items": {
+                    "$ref": "Pair"
                 }
             },
-            "matrix" : {
-                "type" : "array",
-                "items" : {
-                    "type" : "array",
-                    "items" : {
-                        "$ref" : "Letter"
+            "matrix": {
+                "type": "array",
+                "items": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "Letter"
                     }
                 }
             }
@@ -67,44 +67,44 @@ class Pair extends JSONWrapper{
 
     static referencedClasses = [Pair, Letter]
 
-    toString(){
+    toString() {
         return "Sorry, credentials are secret.";
     }
-    
-    getUsername(){
+
+    getUsername() {
         return this.username;
     }
-    getPassword(){
+    getPassword() {
         return "*".repeat(this.password.length)
     }
 }
 
- class User extends JSONWrapper{
+class User extends JSONWrapper {
 
     static schema = {
-        "id" : "User",
-        "type":"object",
-        "properties" : {
-            "credentials" : {
-                "type" : "array",
-                "items" : {
-                    "$ref" : "Credential"
+        "id": "User",
+        "type": "object",
+        "properties": {
+            "credentials": {
+                "type": "array",
+                "items": {
+                    "$ref": "Credential"
                 }
             },
-            "firstName" : {
-                "type" : "string"
+            "firstName": {
+                "type": "string"
             },
-            "lastName" : {
-                "type" : "string"
+            "lastName": {
+                "type": "string"
             },
             "address": {
-                "type" : "object",
-                "properties" : {
-                    "street" : {
-                        "type" : "string"
+                "type": "object",
+                "properties": {
+                    "street": {
+                        "type": "string"
                     },
-                    "city" : {
-                        "type" : "string"
+                    "city": {
+                        "type": "string"
                     }
                 }
             }
@@ -119,50 +119,50 @@ class Pair extends JSONWrapper{
         return this.fullname;
     }
 
-    get fullAddress(){
+    get fullAddress() {
         return this.address.street + ", " + this.address.city
     }
 
-    get fullname(){
+    get fullname() {
         return this.firstName + " " + this.lastName;
     }
 
 }
 
- class Product extends JSONWrapper{
+class Product extends JSONWrapper {
     static schema = {
-        "id" : "Product",
+        "id": "Product",
         "type": "object",
-        "properties" : {
-            "uid" : {
-                "type" : "string"
+        "properties": {
+            "uid": {
+                "type": "string"
             }
         }
     }
     uid = "98765"
 }
 
-class Door extends JSONWrapper{
+class Door extends JSONWrapper {
     static schema = {
-        "id" : "Door",
-        "type" : "object",
+        "id": "Door",
+        "type": "object",
         "properties": {
             "name": "string"
         }
     }
 
-    ring(){
+    ring() {
         return "dlin dlon!"
     }
 }
 
 class House extends JSONWrapper {
     static schema = {
-        "id" : "House",
-        "type" : "object",
-        "properties" : {
-            "door":{
-                "$ref" : "Door"
+        "id": "House",
+        "type": "object",
+        "properties": {
+            "door": {
+                "$ref": "Door"
             }
         }
     }
@@ -170,16 +170,16 @@ class House extends JSONWrapper {
 }
 
 
- class Recursive extends JSONWrapper {
+class Recursive extends JSONWrapper {
 
-    static schema  = {
-        "id" : "Recursive",
-        "type" : "object",
-        "properties" : {
-            "children" : {
-                "type" : "array",
-                "items" : {
-                    "$ref" : "Recursive"
+    static schema = {
+        "id": "Recursive",
+        "type": "object",
+        "properties": {
+            "children": {
+                "type": "array",
+                "items": {
+                    "$ref": "Recursive"
                 }
             }
         }
@@ -188,12 +188,12 @@ class House extends JSONWrapper {
     static referencedClasses = [Recursive]
 
 
-    get level(){
+    get level() {
         return "L3"
     }
-    
 
-    print(){
+
+    print() {
         console.log("Hello world");
     }
 }
@@ -202,15 +202,15 @@ class House extends JSONWrapper {
 let request = fs.readFileSync(path.resolve('./spec/fixtures/resources/sample-request.json'))
 
 describe("----UNIT TESTS----\n", () => {
-    describe("Nested immediate class objects",() => {
-        it("should expose working methods",() => {
+    describe("Nested immediate class objects", () => {
+        it("should expose working methods", () => {
             let aHouse = House.fromJsonString('{"door":{"name":"White"}}')
             expect(aHouse.door.ring()).toBe("dlin dlon!")
         })
     })
-    describe("A class object instantiate with a json smaller than its schema",() => {
+    describe("A class object instantiate with a json smaller than its schema", () => {
         it("shouldn't change the json data structure", () => {
-            let json = {"firstName": "Rico", "lastName": "Suarez"}
+            let json = { "firstName": "Rico", "lastName": "Suarez" }
             let aUser = User.fromJsonObject(json)
             expect(aUser.toJsonObject()).toEqual(json)
         })
@@ -311,7 +311,7 @@ describe("----UNIT TESTS----\n", () => {
         })
     })
 
-    describe("Recursive nested classes",() => {
+    describe("Recursive nested classes", () => {
         it("should be able to work properly", () => {
             const recursive = Recursive.fromJsonString('{"children":[{"children":[{"children":[{"children":null}]}]}]}')
             expect(recursive.children[0].children[0].children[0].level).toBe("L3")
@@ -321,92 +321,93 @@ describe("----UNIT TESTS----\n", () => {
 })
 
 describe("----INTEGRATION TESTS----\n", () => {
-        describe("Minimal object",() => {
-            let json = {"credentials": [{"numberPairs" : [{}], "matrix": [[{}]]}]} 
+    describe("Minimal object", () => {
+        let json = { "credentials": [{ "numberPairs": [{}], "matrix": [[{}]] }] }
 
-            it("should call constructors of the top class once", () => {
-                let constructorUser = spyOn(User.prototype,'constructor').and.callThrough()
-                let minimalUser = User.minimalObject(json, new User())
-                expect(constructorUser).toHaveBeenCalledTimes(1)
-                constructorUser.calls.reset()
+        it("should call constructors of the top class once", () => {
+            let constructorUser = spyOn(User.prototype, 'constructor').and.callThrough()
+            let minimalUser = User.minimalObject(json, new User())
+            expect(constructorUser).toHaveBeenCalledTimes(1)
+            constructorUser.calls.reset()
 
-            })
-            it("should call constructors of referenced classes once", () => {
-                let constructorCred = spyOn(Credential.prototype,'constructor').and.callThrough()
-                let minimalUser = User.minimalObject(json,new User())
-                expect(constructorCred).toHaveBeenCalledTimes(1)
-                constructorCred.calls.reset()
-
-            })
-            it("shouldn't call constructors of referenced classes of referenced classes", () => {
-                let constructorPair = spyOn(Pair.prototype,'constructor').and.callThrough()
-                let constructorLett = spyOn(Letter.prototype,'constructor').and.callThrough()
-                let minimalUser = User.minimalObject(json, new User())
-                expect(constructorPair).not.toHaveBeenCalled()
-                expect(constructorLett).not.toHaveBeenCalled()
-                constructorPair.calls.reset()
-                constructorLett.calls.reset()
-
-            })
         })
-    describe("Constructor", () => {
+        it("should call constructors of referenced classes once", () => {
+            let constructorCred = spyOn(Credential.prototype, 'constructor').and.callThrough()
+            let minimalUser = User.minimalObject(json, new User())
+            expect(constructorCred).toHaveBeenCalledTimes(1)
+            constructorCred.calls.reset()
+
+        })
+        it("shouldn't call constructors of referenced classes of referenced classes", () => {
+            let constructorPair = spyOn(Pair.prototype, 'constructor').and.callThrough()
+            let constructorLett = spyOn(Letter.prototype, 'constructor').and.callThrough()
+            let minimalUser = User.minimalObject(json, new User())
+            expect(constructorPair).not.toHaveBeenCalled()
+            expect(constructorLett).not.toHaveBeenCalled()
+            constructorPair.calls.reset()
+            constructorLett.calls.reset()
+
+        })
+    })
+    describe("The 'fromJsonObject' method", () => {
         let requestObj
         beforeEach(() => {
             requestObj = JSON.parse(request)
         })
         it("of instantiated top class should have been called once", () => {
-            let spyUser = spyOn(User.prototype, 'constructor').and.callThrough()
+            let spyUser = spyOn(User, 'fromJsonObject').and.callThrough()
             let aUser = User.fromJsonObject(requestObj)
             expect(spyUser).toHaveBeenCalledTimes(1)
             spyUser.calls.reset()
         })
 
-        describe("of nested classes", () => {
-            const classes = [Credential, Pair, Letter]
-            let testClass
-            let i = 0
-            let spy
-            const testCases = {
-                "User": {
-                    "numberOfInstances": 1,
-                    "timesReferencedBy": {}
-                },
-                "Credential": {
-                    "numberOfInstances": 2,
-                    "timesReferencedBy": {
-                        "User": 1
-                    }
-                },
-                "Pair": {
-                    "numberOfInstances": 4,
-                    "timesReferencedBy": {
-                        "Credential": 1
-                    }
-                },
-                "Letter": {
-                    "numberOfInstances": 13,
-                    "timesReferencedBy": {
-                        "Credential": 1
-                    }
-                }
 
+    })
+
+    describe("The 'fromJsonObject' method of nested classes", () => {
+        let requestObj
+        const classes = [Credential, Pair, Letter]
+        let spy
+        const testCases = {
+            "User": {
+                "numberOfInstances": 1,
+                "timesReferencedBy": {}
+            },
+            "Credential": {
+                "numberOfInstances": 2,
+                "timesReferencedBy": {
+                    "User": 1
+                }
+            },
+            "Pair": {
+                "numberOfInstances": 4,
+                "timesReferencedBy": {
+                    "Credential": 1
+                }
+            },
+            "Letter": {
+                "numberOfInstances": 13,
+                "timesReferencedBy": {
+                    "Credential": 1
+                }
             }
-            beforeEach(() => {
-                testClass = classes[i++]
-               spy = spyOn(testClass,'fromJsonObject').and.callThrough()
-            })
-            it("should have been called 1 times per instance + 1 more time for every other class that reference it", () => {
+
+        }
+        beforeEach(() => {
+            requestObj = JSON.parse(request)
+        })
+        classes.forEach((testClass) => {
+            it("should have been called once for each instance", () => {
+                spy = spyOn(testClass, 'fromJsonObject').and.callThrough()
                 User.fromJsonObject(requestObj)
                 let info = testCases[testClass.name]
-                expect(spy).toHaveBeenCalledTimes(
-                        info.numberOfInstances + 0
-             //           Object.entries(info.timesReferencedBy).reduce( (prev, [cls, timesRef]) => 
-              //                  prev + testCases[cls].numberOfInstances * timesRef, 0)
-                    )
-                    spy.calls.reset()
+                expect(spy).toHaveBeenCalledTimes(info.numberOfInstances)
+                spy.calls.reset()
 
             })
+
         })
+
     })
 })
 
@@ -416,12 +417,12 @@ describe("----PERFORMANCE TESTS----\n", () => {
     let schema;
     beforeEach(() => {
         timer = new jasmine.Timer();
-        schema = {"children": { "type": "array", "items" :{"$ref" : "Recursive"} }}
+        schema = { "children": { "type": "array", "items": { "$ref": "Recursive" } } }
     })
     describe("For deep json with", () => {
         it("10 levels (binary tree) it should execute under 0.2s", () => {
             let x10DeepJson = Fake.jsonStringFromClass(Recursive, schema,
-                 {"refDepthMin":"10","refDepthMax": "10","minItems":"2", "maxItems":"2" })
+                { "refDepthMin": "10", "refDepthMax": "10", "minItems": "2", "maxItems": "2" })
 
             Recursive.maxLevel = 10;
             timer.start()
@@ -430,7 +431,7 @@ describe("----PERFORMANCE TESTS----\n", () => {
         })
         it("100 levels it should execute under 0.1s", () => {
             let x100DeepJson = Fake.jsonStringFromClass(Recursive, schema,
-                 {"refDepthMin":"100","refDepthMax": "100","minItems":"1", "maxItems":"1" })
+                { "refDepthMin": "100", "refDepthMax": "100", "minItems": "1", "maxItems": "1" })
             Recursive.maxLevel = 100;
             timer.start()
             Recursive.fromJsonString(x100DeepJson).toJsonObject()
@@ -438,7 +439,7 @@ describe("----PERFORMANCE TESTS----\n", () => {
         })
         it("1000 levels should execute under 0.2s", () => {
             let x1000DeepJson = Fake.jsonStringFromClass(Recursive, schema,
-                 {"refDepthMin":"1000","refDepthMax": "1000","minItems":"1", "maxItems":"1" })
+                { "refDepthMin": "1000", "refDepthMax": "1000", "minItems": "1", "maxItems": "1" })
             Recursive.maxLevel = 1000;
             timer.start()
             Recursive.fromJsonString(x1000DeepJson).toJsonObject()

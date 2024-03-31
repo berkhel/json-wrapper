@@ -133,12 +133,12 @@ class JSONWrapper {
         const modelInstance = this.modelInstance
 
         const replace$classMarkersWithClassInstances = (node) => {
-            function replaceMarked(entry, withClass) {
-                delete entry.$class
-                return _.merge(new withClass.prototype.constructor(), entry);
-            }
             const foundClass = classReferences.find(cls => cls.name === node["$class"])
-            return foundClass? replaceMarked(node, foundClass) : node
+            return foundClass? replaceMarkedNode(foundClass) : node
+            function replaceMarkedNode(withClass) {
+                delete node.$class
+                return _.merge(new withClass.prototype.constructor(), node);
+            }
         }
 
         function toClassObject(node){
@@ -176,9 +176,7 @@ class JSONWrapper {
      * @returns {JSONWrapper} an instance of the class from which this method is called
      */
     static fromJsonObject(jsonObj) {
-        let tempObj = this.minimalObject(jsonObj) 
-        let res = _.mergeWith(tempObj, jsonObj, this.handleObjects);
-        return res
+        return _.mergeWith(this.minimalObject(jsonObj), jsonObj, JSONWrapper.#handleObjects);
     }
 
     /**
@@ -202,13 +200,13 @@ class JSONWrapper {
      * @param {Object} jsonObjNode - corresponding object of {@link classObjNode} in the json object
      * @returns {(Object | Array | undefined)}
      */
-    static handleObjects(classObjNode, jsonObjNode) {
+    static #handleObjects(classObjNode, jsonObjNode) {
         if(classObjNode instanceof JSONWrapper){
             return classObjNode.constructor.fromJsonObject(jsonObjNode)
         }
         if(_.isArray(classObjNode) && _.isArray(jsonObjNode)){
             return jsonObjNode.map(jsonObjNodeElem =>
-                 JSONWrapper.handleObjects(classObjNode[0], jsonObjNodeElem) )
+                 JSONWrapper.#handleObjects(classObjNode[0], jsonObjNodeElem) )
         }
     }
 }
