@@ -101,7 +101,7 @@ class JSONWrapper {
 
     static get markedSchema() {
         if (!this._markedSchema) {
-            let schema = _.merge({}, this.schema)
+            let schema = _.cloneDeep(this.schema)
             schema.properties["$class"] = { "enum": [this.name] }
             traverse(schema).forEach(function (node) {
                 if (node["$ref"]) {
@@ -111,8 +111,8 @@ class JSONWrapper {
             schema.required = ["$class"]
                 .concat(this.schema?.required || [])
                 .concat(Object.entries(schema.properties)
-                    .filter(([key, value]) => value["$class"] || value.type === "object" || value.type === "array")
-                    .map(([key, value]) => key))
+                    .filter(([, value]) => value["$class"] || value.type === "object" || value.type === "array")
+                    .map(([key, ]) => key))
             this._markedSchema = schema;
         }
         return this._markedSchema
@@ -132,7 +132,7 @@ class JSONWrapper {
         const classReferences = [this].concat(this.referencedClasses)
         const modelInstance = this.modelInstance
 
-        const replace$classMarkersWithClassInstances = (node, inst) => {
+        const replace$classMarkersWithClassInstances = (node) => {
             function replaceMarked(entry, withClass) {
                 delete entry.$class
                 return _.merge(new withClass.prototype.constructor(), entry);
@@ -141,16 +141,21 @@ class JSONWrapper {
             return foundClass? replaceMarked(node, foundClass) : node
         }
 
-        function markersToClassObjects(node){
-            if(!traverse(jsonObject).has(this.path) && !traverse(modelInstance).has(this.path)){
-                this.delete()
-            }else if(node["$class"]) this.update(replace$classMarkersWithClassInstances(node))
+        function toClassObject(node){
+            if(isNotUsed(this.path)) {this.delete(); return}
+            if(node.hasOwnProperty("$class")) this.update(replace$classMarkersWithClassInstances(node))
+        }
+
+        function isNotUsed(nodePath){
+            if(!traverse(jsonObject).has(nodePath) && !traverse(modelInstance).has(nodePath)){
+                return true
+            }
         }
 
         
 
         
-        return traverse(JsonGenerator.generate(this.markedSchema)).map(markersToClassObjects)
+        return traverse(JsonGenerator.generate(this.markedSchema)).map(toClassObject)
 
     }
 
@@ -171,7 +176,9 @@ class JSONWrapper {
      * @returns {JSONWrapper} an instance of the class from which this method is called
      */
     static fromJsonObject(jsonObj) {
-        return JSONWrapper.#jsonObjectToClassObject(jsonObj, this.prototype.constructor)
+        let tempObj = this.minimalObject(jsonObj) 
+        let res = _.mergeWith(tempObj, jsonObj, this.handleObjects);
+        return res
     }
 
     /**
@@ -188,33 +195,20 @@ class JSONWrapper {
         return JSON.parse(JSON.stringify(this))
     }
 
-    /**
-     * @private
-     * @param {Object} jsonObject - a json object
-     * @param {new() => T} constructor - a constructor of any type, it must be possible to call it with new constructor()
-     * @returns {T} an instance of type T containing deep copied data from jsonObject
-     */
-    static #jsonObjectToClassObject(jsonObject, constructor) {
-        let tempObj = constructor.minimalObject?.(jsonObject) || new constructor()
-        let res = _.mergeWith(tempObj, jsonObject, JSONWrapper.#handleObjects);
-        return res 
-    }
-
 
     /**
      * @private
-     * @param {Object} classObjNode - array at some point in the state structure of the JSONWrapper object
-     * @param {Object} jsonObjNode - corresponding array of {@link classObjNode} in the json object
-     * @returns {(Array.<Array> | Array.<Object> | undefined)}
+     * @param {Object} classObjNode - object at some point in the state structure of the JSONWrapper object
+     * @param {Object} jsonObjNode - corresponding object of {@link classObjNode} in the json object
+     * @returns {(Object | Array | undefined)}
      */
-    static #handleObjects(classObjNode, jsonObjNode) {
-        if(classObjNode instanceof JSONWrapper && !_.isArray(classObjNode)){
-            return JSONWrapper.#jsonObjectToClassObject(jsonObjNode, classObjNode.constructor)
+    static handleObjects(classObjNode, jsonObjNode) {
+        if(classObjNode instanceof JSONWrapper){
+            return classObjNode.constructor.fromJsonObject(jsonObjNode)
         }
         if(_.isArray(classObjNode) && _.isArray(jsonObjNode)){
-            assert(_.isArray(jsonObjNode),"not array"+JSON.stringify(jsonObjNode)) 
             return jsonObjNode.map(jsonObjNodeElem =>
-                 JSONWrapper.#handleObjects(classObjNode[0], jsonObjNodeElem) )
+                 JSONWrapper.handleObjects(classObjNode[0], jsonObjNodeElem) )
         }
     }
 }
