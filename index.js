@@ -1,5 +1,3 @@
-'use strict'
+const JSONWrapper = require( "./classes" )
 
-const JSONWrapper = require('./classes');
-
-module.exports =  JSONWrapper;
+module.exports = JSONWrapper

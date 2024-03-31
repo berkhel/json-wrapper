@@ -26,111 +26,20 @@ const JSONWrapper = require("json-wrapper")
 
 [,javascript]
 ----
- class User extends JSONWrapper {
-  static schema = {
-   "id" : "User",
-   "type" : "object",
-   "properties" : {
-     "first_name" : {"type":"string"},
-     "last_name" : {"type":"string"}
-   }
- }
-  getFullname(){
-    return this.first_name + " " + this.last_name
-  }    
- }
- let aUser = User.fromJsonString('{first_name: "John", last_name: "Doe"}')
- console.log(aUser.getFullname()) //prints "John Doe"
+include::examples/simple-usage.js[lines=2..-1]
 ----
 
 === nested usage
 [,javascript]
 ----
- class App extends JSONWrapper {
-     static schema = {
-       "id" : "App",
-       "type" : "object",
-       "properties" : {
-          "users" : {
-            "type" : "array",
-            "items" : {
-              "$ref":"User"
-            }
-          }
-        }
-      }
-
-     static referencedClasses = [User]
- }
-
- class User extends JSONWrapper {
-    static schema = {
-      "id" : "User",
-      "type" : "object",
-      "properties" : {
-        "country" : { 
-          "$ref" : "Country" 
-         }
-       }
-      }
-    static referencedClasses = [Country]
- }
- class Country extends JSONWrapper {
-   static schema = {
-     "type" : "object",
-     "properties" : {
-       "language" : {
-       "type" : "string" 
-      },
-      "code" : {
-         "type":"string"
-      }
-     }
-    }
-
-    get locale() {
-      return this.language + "_" + this.code
-    }
-
- }
-
- let app = App.fromJsonString(`{
-   users : [{
-      first_name: "John",
-      last_name: "Doe",
-      country: {
-          language : "it"
-          code : "IT"
-       }
-      }]
-  }`)
-  console.log(app.users[0].country.locale) //prints "it_IT"
+include::examples/nested-usage.js[lines=2..-1]
 ---- 
 
 === constructors that doesn't respect the contract
 
 [,javascript]
 ----
- class User extends JSONWrapper {
-  //schema and classReferenced omitted
-       constructor(name) {
-           super();
-           if(!name) throw Error();
-           this.name = name;
-    }
-  }
-  
-  
-  class User extends JSONWrapper {
-  //schema omitted
-    static referencedClasses = [Country]
-  }
-  class Country {
-      constructor(countryCode) { 
-           if(!countryCode) throw Error();
-           this.countryCode = countryCode;
-      }
-  }
+include::examples/broken-contract.js[lines=2..-1]
 ----
 
 == Methods

@@ -1,7 +1,7 @@
-const assert = require('node:assert').strict;
-const _ = require('lodash');
-const JsonGenerator = require('json-schema-faker').JSONSchemaFaker;
-const traverse = require('traverse');
+const assert = require( "node:assert" ).strict
+const _ = require( "lodash" )
+const JsonGenerator = require( "json-schema-faker" ).JSONSchemaFaker
+const traverse = require( "traverse" )
 
 /**
  *
@@ -80,120 +80,122 @@ const traverse = require('traverse');
  *
  */
 class JSONWrapper {
-  static schema = {};
-  static referencedClasses = [];
+    static schema = {}
+    static referencedClasses = []
 
-  static {
-    JSONWrapper.#configureGenerator();
-  }
+    static {
+        JSONWrapper.#configureGenerator()
+    }
 
 
-  /**
+    /**
      * Factory method
      * @param {string} json - a json string compatible with the class from which this method is called
      * @return {JSONWrapper} an instance of the class from which this method is called
      */
-  static fromJsonString(json) {
-    return this.fromJsonObject(JSON.parse(json));
-  }
+    static fromJsonString( json ) {
+        return this.fromJsonObject( JSON.parse( json ) )
+    }
 
-  /**
+    /**
      * Factory method
      * @param {string} jsonObj - a json object compatible with the class from which this method is called
      * @return {JSONWrapper} an instance of the class from which this method is called
      */
-  static fromJsonObject(jsonObj) {
-    return _.mergeWith(this.minimalObject(jsonObj), jsonObj, JSONWrapper.#handleObjects);
-  }
+    static fromJsonObject( jsonObj ) {
+        return _.mergeWith( this.minimalObject( jsonObj ), jsonObj, JSONWrapper.#handleObjects )
+    }
 
-  /**
+    /**
      * @return {string} the json string from the actual state of the instance
      */
-  toJsonString() {
-    return JSON.stringify(this);
-  }
+    toJsonString() {
+        return JSON.stringify( this )
+    }
 
-  /**
+    /**
      * @return {Object} the json object from the actual state of the instance
      */
-  toJsonObject() {
-    return JSON.parse(JSON.stringify(this));
-  }
+    toJsonObject() {
+        return JSON.parse( JSON.stringify( this ) )
+    }
 
 
-  /**
+    /**
      * @private
      * @param {Object} classObjNode - object at some point in the state structure of the JSONWrapper object
      * @param {Object} jsonObjNode - corresponding object of {@link classObjNode} in the json object
      * @return {(Object | Array | undefined)}
      */
-  static #handleObjects(classObjNode, jsonObjNode) {
-    if (classObjNode instanceof JSONWrapper)
-     {
-      return classObjNode.constructor.fromJsonObject(jsonObjNode);
-    }
-    if (_.isArray(classObjNode) && _.isArray(jsonObjNode)) {
-      return jsonObjNode.map((jsonObjNodeElem) =>
-        JSONWrapper.#handleObjects(classObjNode[0], jsonObjNodeElem) );
-    }
-  }
-
-  static #configureGenerator() {
-    JsonGenerator.option({
-      'refDepthMax': '0',
-      'minItems': '1',
-      'maxItems': '1',
-      'requiredOnly': true,
-      'omitNulls': false,
-    });
-  }
-
-  static get markedSchema() {
-    if (!this._markedSchema) {
-      const schema = _.cloneDeep(this.schema);
-      schema.properties['$class'] = {'enum': [this.name]};
-      traverse(schema).forEach(function(node) {
-        if (node['$ref']) {
-          this.update({'$class': {'enum': [node['$ref']]}});
+    static #handleObjects( classObjNode, jsonObjNode ) {
+        if ( classObjNode instanceof JSONWrapper ) {
+            return classObjNode.constructor.fromJsonObject( jsonObjNode )
         }
-      });
-      schema.required = ['$class']
-          .concat(this.schema?.required || [])
-          .concat(Object.entries(schema.properties)
-              .filter(([, value]) => value['$class'] || value.type === 'object' || value.type === 'array')
-              .map(([key]) => key));
-      this._markedSchema = schema;
-    }
-    return this._markedSchema;
-  }
-
-  static get modelInstance() {
-    return this._instance ??= new this.prototype.constructor();
-  }
-
-  static minimalObject(jsonObject) {
-    const replace$classMarkersWithClassInstances = (node) => {
-      const foundClass = [this].concat(this.referencedClasses).find((cls) => cls.name === node['$class']);
-      return foundClass? replaceMarkedNode(foundClass) : node;
-      function replaceMarkedNode(withClass) {
-        delete node.$class;
-        return _.merge(new withClass.prototype.constructor(), node);
-      }
-    };
-
-    function toClassObject(node) {
-      if (isInSchemaButIsNotUsed(this.path)) {
-        this.delete(); return;
-      }
-      if (node.hasOwnProperty('$class')) this.update(replace$classMarkersWithClassInstances(node));
+        if ( _.isArray( classObjNode ) && _.isArray( jsonObjNode ) ) {
+            return jsonObjNode.map( ( jsonObjNodeElem ) =>
+                JSONWrapper.#handleObjects( classObjNode[0], jsonObjNodeElem ) )
+        }
     }
 
-    const isInSchemaButIsNotUsed = (nodePath) => {
-      return !traverse(jsonObject).has(nodePath) && !traverse(this.modelInstance).has(nodePath);
-    };
+    static #configureGenerator() {
+        JsonGenerator.option({
+            "refDepthMax" : "0",
+            "minItems" : "1",
+            "maxItems" : "1",
+            "requiredOnly" : true,
+            "omitNulls" : false,
+        })
+    }
 
-    return traverse(JsonGenerator.generate(this.markedSchema)).map(toClassObject);
-  }
+    static get markedSchema() {
+        if ( !this._markedSchema ) {
+            const schema = _.cloneDeep( this.schema )
+            schema.properties["$class"] = {"enum" : [this.name]}
+            traverse( schema ).forEach( function( node ) {
+                if ( node["$ref"] ) {
+                    this.update({"$class" : {"enum" : [node["$ref"]]}})
+                }
+            })
+            schema.required = ["$class"]
+
+                .concat( this.schema?.required || [] )
+                .concat( Object.entries( schema.properties )
+                    .filter( ( [, value] ) => value["$class"] || value.type === "object" || value.type === "array" )
+                    .map( ( [key] ) => key ) )
+            this._markedSchema = schema
+        }
+        return this._markedSchema
+    }
+
+    static get modelInstance() {
+        return this._instance ??= new this.prototype.constructor()
+    }
+
+    static minimalObject( jsonObject ) {
+		
+        const replace$classMarkersWithClassInstances = ( node ) => {
+            const foundClass = [this].concat( this.referencedClasses ).find( ( cls ) => cls.name === node["$class"] )
+            return foundClass ? replaceMarkedNode( foundClass ) : node
+            function replaceMarkedNode( withClass ) {
+                delete node.$class
+                return _.merge( new withClass.prototype.constructor(), node )
+            }
+        }
+
+        function toClassObject( node ) {
+            if ( isInSchemaButIsNotUsed( this.path ) ) {
+                this.delete()
+                return
+            }
+            if ( Object.prototype.hasOwnProperty.call( node, "$class" ) ) this.update( replace$classMarkersWithClassInstances( node ) )
+        }
+
+        const isInSchemaButIsNotUsed = ( nodePath ) => {
+            return !traverse( jsonObject ).has( nodePath ) && !traverse( this.modelInstance ).has( nodePath )
+        }
+
+        return traverse( JsonGenerator.generate( this.markedSchema ) ).map( toClassObject )
+    }
 }
 
-module.exports = JSONWrapper;
+module.exports = JSONWrapper
