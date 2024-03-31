@@ -26,20 +26,20 @@ const JSONWrapper = require("json-wrapper")
 
 [,javascript]
 ----
-include::examples/simple-usage.js[lines=2..-1]
+include::https://github.com/berkhel/json-wrapper/blob/7fa253b1eafcf4c747dfbed010599214bf2b5001/examples/simple-usage.js[lines=2..-1]
 ----
 
 === nested usage
 [,javascript]
 ----
-include::examples/nested-usage.js[lines=2..-1]
+include::https://github.com/berkhel/json-wrapper/blob/7fa253b1eafcf4c747dfbed010599214bf2b5001/examples/broken-contract.js[lines=2..-1]
 ---- 
 
 === constructors that doesn't respect the contract
 
 [,javascript]
 ----
-include::examples/broken-contract.js[lines=2..-1]
+include::https://github.com/berkhel/json-wrapper/blob/7fa253b1eafcf4c747dfbed010599214bf2b5001/examples/broken-contract.js[lines=2..-1]
 ----
 
 == Methods
