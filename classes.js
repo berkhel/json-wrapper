@@ -80,7 +80,17 @@ const traverse = require( "traverse" )
  *
  */
 class JSONWrapper {
+
+    /**
+     * the json schema that every instance of this class must follow
+     * @type {object}
+     */
     static schema = {}
+
+    /**
+     * array of all the classes that are referenced with '$ref' in {@link schema}
+     * @type {Array.<new() => object>} 
+     */
     static referencedClasses = []
 
     static {
@@ -90,7 +100,7 @@ class JSONWrapper {
 
     /**
      * Factory method
-     * @param {string} json - a json string compatible with the class from which this method is called
+     * @param {string} json - a json string compatible with {@link schema}
      * @return {JSONWrapper} an instance of the class from which this method is called
      */
     static fromJsonString( json ) {
@@ -99,7 +109,7 @@ class JSONWrapper {
 
     /**
      * Factory method
-     * @param {string} jsonObj - a json object compatible with the class from which this method is called
+     * @param {string} jsonObj - a json object compatible with {@link schema}
      * @return {JSONWrapper} an instance of the class from which this method is called
      */
     static fromJsonObject( jsonObj ) {
@@ -107,14 +117,14 @@ class JSONWrapper {
     }
 
     /**
-     * @return {string} the json string from the actual state of the instance
+     * @return {string} the json string representing the inner data of the instance
      */
     toJsonString() {
         return JSON.stringify( this )
     }
 
     /**
-     * @return {Object} the json object from the actual state of the instance
+     * @return {Object} the json object representing a copy of the inner data of the instance
      */
     toJsonObject() {
         return JSON.parse( JSON.stringify( this ) )
@@ -137,9 +147,18 @@ class JSONWrapper {
         }
     }
 
+    /**
+     * The module json-schema-faker is used only to generate a minimal object,
+     *  a template object with one element for each node.
+     * That one element will be used in {@link #handleObjects} as a template to remap each element of the json received.
+     * For this reason, this configuration is made to avoid:
+     * * to much nodes to be generated 
+     * * fields to be populated with random values
+     * * multiple recursive references (one is sufficient)
+     */
     static #configureGenerator() {
         JsonGenerator.option({
-            "refDepthMax" : "0",
+            "refDepthMax" : "1",
             "minItems" : "1",
             "maxItems" : "1",
             "requiredOnly" : true,
@@ -147,54 +166,56 @@ class JSONWrapper {
         })
     }
 
+    /**
+     * $ref tag are mapped to $class tag in order to be handled by {@link minimalObject}
+     */
     static get markedSchema() {
         if ( !this._markedSchema ) {
             const schema = _.cloneDeep( this.schema )
-            schema.properties["$class"] = {"enum" : [this.name]}
             traverse( schema ).forEach( function( node ) {
                 if ( node["$ref"] ) {
                     this.update({"$class" : {"enum" : [node["$ref"]]}})
                 }
             })
-            schema.required = ["$class"]
-
-                .concat( this.schema?.required || [] )
-                .concat( Object.entries( schema.properties )
-                    .filter( ( [, value] ) => value["$class"] || value.type === "object" || value.type === "array" )
-                    .map( ( [key] ) => key ) )
+            schema.required = Object.entries( schema.properties )
+                .filter( ( [, value] ) => value["$class"] || value.type === "object" || value.type === "array" )
+                .map( ( [key] ) => key )
             this._markedSchema = schema
         }
         return this._markedSchema
     }
 
-    static get modelInstance() {
-        return this._instance ??= new this.prototype.constructor()
-    }
 
+    /**
+     * Generate an instance of JSONWrapper with only one element for each array
+     * The $ref tag in the schema are converted into instances of classes
+     * @param {object} jsonObject 
+     * @returns {JSONWrapper} 
+     */
     static minimalObject( jsonObject ) {
-		
-        const replace$classMarkersWithClassInstances = ( node ) => {
-            const foundClass = [this].concat( this.referencedClasses ).find( ( cls ) => cls.name === node["$class"] )
-            return foundClass ? replaceMarkedNode( foundClass ) : node
-            function replaceMarkedNode( withClass ) {
-                delete node.$class
-                return _.merge( new withClass.prototype.constructor(), node )
-            }
+
+        const tipify = ( object, withClass ) => {
+            return _.merge( new withClass.prototype.constructor(), object )
         }
 
-        function toClassObject( node ) {
-            if ( isInSchemaButIsNotUsed( this.path ) ) {
+        function isUsedInJsonObject() {
+            if( !traverse( jsonObject ).has( this.path ) ) {
                 this.delete()
-                return
+            }else{
+                return true
             }
-            if ( Object.prototype.hasOwnProperty.call( node, "$class" ) ) this.update( replace$classMarkersWithClassInstances( node ) )
         }
 
-        const isInSchemaButIsNotUsed = ( nodePath ) => {
-            return !traverse( jsonObject ).has( nodePath ) && !traverse( this.modelInstance ).has( nodePath )
+        let that = this
+        function $classMarkersWithClassInstances( node ) {
+            if ( isUsedInJsonObject.apply( this ) && _.isObject( node ) && Reflect.has( node, "$class" ) ) {
+                const foundClass = that.referencedClasses.find( ( cls ) => cls.name === node["$class"] )
+                delete node.$class
+                return foundClass ? tipify( node, foundClass ) : node
+            }
         }
 
-        return traverse( JsonGenerator.generate( this.markedSchema ) ).map( toClassObject )
+        return tipify( traverse( JsonGenerator.generate( this.markedSchema ) ).map( $classMarkersWithClassInstances ), this )
     }
 }
 
