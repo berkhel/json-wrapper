@@ -1,6 +1,7 @@
 = JSON WRAPPER
 
-Enrich and manipulate a json object with the behavior of a class object.
+Enrich and manipulate a json object with the behavior of a class object. +
+Inspired by link:https://martinfowler.com/articles/refactoring-document-load.html[Refactoring Code to Load a Document].
 
 == Import
 === ES6
