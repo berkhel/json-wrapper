@@ -167,9 +167,9 @@ class JSONWrapper {
     }
 
     /**
-     * $ref tag are mapped to $class tag in order to be handled by {@link minimalObject}
+     * $ref tags are mapped to $class tags in order to be handled by {@link minimalObject}
      */
-    static get markedSchema() {
+    static get $classMarkedSchema() {
         if ( !this._markedSchema ) {
             const schema = _.cloneDeep( this.schema )
             traverse( schema ).forEach( function( node ) {
@@ -188,7 +188,7 @@ class JSONWrapper {
 
     /**
      * Generate an instance of JSONWrapper with only one element for each array
-     * The $ref tag in the schema are converted into instances of classes
+     * The $ref tags in the schema are converted to $class tags and then to instances of classes
      * @param {object} jsonObject 
      * @returns {JSONWrapper} 
      */
@@ -199,23 +199,23 @@ class JSONWrapper {
         }
 
         function isUsedInJsonObject() {
-            if( !traverse( jsonObject ).has( this.path ) ) {
+            if ( !traverse( jsonObject ).has( this.path ) ) {
                 this.delete()
-            }else{
+            } else {
                 return true
             }
         }
 
         let that = this
-        function $classMarkersWithClassInstances( node ) {
+        function $classMarkersToClassInstances( node ) {
             if ( isUsedInJsonObject.apply( this ) && _.isObject( node ) && Reflect.has( node, "$class" ) ) {
-                const foundClass = that.referencedClasses.find( ( cls ) => cls.name === node["$class"] )
+                const foundClass = that.referencedClasses.find( cls => cls.name === node["$class"] )
                 delete node.$class
                 return foundClass ? tipify( node, foundClass ) : node
             }
         }
 
-        return tipify( traverse( JsonGenerator.generate( this.markedSchema ) ).map( $classMarkersWithClassInstances ), this )
+        return tipify( traverse( JsonGenerator.generate( this.$classMarkedSchema ) ).map( $classMarkersToClassInstances ), this )
     }
 }
 
