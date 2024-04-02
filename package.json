@@ -4,7 +4,14 @@
   "description": "A wrapper class to encapsulate json objects",
   "main": "index.js",
   "scripts": {
-    "test": "node --stack-size=3000 spec/support/jasmine-runner.js"
+    "test": "node --stack-size=3000 spec/support/jasmine-runner.js",
+    "coverage": "nyc --reporter=lcov npm run test"
+  },
+  "nyc": {
+    "report-dir": ".nyc_output",
+    "exclude": [
+      "spec/**/*"
+    ]
   },
   "author": "berkhel",
   "license": "MIT",
@@ -17,9 +24,9 @@
     "type": "git",
     "url": "https://github.com/berkhel/json-wrapper.git"
   },
-   "engines" : { 
-    "npm" : ">=8.0.0",
-    "node" : ">=16.0.0"
+  "engines": {
+    "npm": ">=8.0.0",
+    "node": ">=16.0.0"
   },
   "dependencies": {
     "json-schema-faker": "^0.5.6",
@@ -30,6 +37,7 @@
     "@stylistic/eslint-plugin-js": "^1.7.0",
     "eslint": "^8.57.0",
     "jasmine": "^5.1.0",
-    "jasmine-spec-reporter": "^7.0.0"
+    "jasmine-spec-reporter": "^7.0.0",
+    "nyc": "^15.1.0"
   }
 }
