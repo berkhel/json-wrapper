@@ -1,6 +1,7 @@
 = JSON WRAPPER
 
-Enrich and manipulate a json object with the behavior of a class object.
+Enrich and manipulate a json object with the behavior of a class object. +
+Inspired by link:https://martinfowler.com/articles/refactoring-document-load.html[Refactoring Code to Load a Document].
 
 == Import
 === ES6
@@ -22,7 +23,7 @@ const JsonWrapper = require("json-wrapper")
 
 == Examples 
 
-=== simple usage
+=== Simple usage
 
 [,javascript]
 ----
@@ -44,7 +45,7 @@ let aUser = User.fromJsonString( "{first_name: \"John\", last_name: \"Doe\"}" )
 console.log( aUser.getFullname() ) //prints "John Doe"
 ----
 
-=== nested usage
+=== Nested usage
 [,javascript]
 ----
 class App extends JsonWrapper {
@@ -112,7 +113,7 @@ console.log( app.users[0].country.locale ) //prints "it_IT"
 ----
 class Account extends JsonWrapper {
     //schema and classReferenced omitted
-    constructor( name ) {
+    constructor( name ) { // new Account() not callable !
         super()
         if( !name ) throw Error()
         this.name = name
@@ -122,7 +123,7 @@ class Account extends JsonWrapper {
  
 class User extends JsonWrapper {
     //schema omitted
-    static referencedClasses = [Country]
+    static referencedClasses = [Country] // new Country() not callable !
 }
 
 class Country {
