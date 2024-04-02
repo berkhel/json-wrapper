@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-class App extends JSONWrapper {
+class App extends JsonWrapper {
     static schema = {
         "id" : "App",
         "type" : "object",
@@ -16,7 +16,7 @@ class App extends JSONWrapper {
     static referencedClasses = [User]
 }
 
-class User extends JSONWrapper {
+class User extends JsonWrapper {
     static schema = {
         "id" : "User",
         "type" : "object",
@@ -28,7 +28,7 @@ class User extends JSONWrapper {
     }
     static referencedClasses = [Country]
 }
-class Country extends JSONWrapper {
+class Country extends JsonWrapper {
     static schema = {
         "type" : "object",
         "properties" : {

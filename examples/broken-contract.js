@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-class Account extends JSONWrapper {
+class Account extends JsonWrapper {
     //schema and classReferenced omitted
     constructor( name ) {
         super()
@@ -9,7 +9,7 @@ class Account extends JSONWrapper {
 }
  
  
-class User extends JSONWrapper {
+class User extends JsonWrapper {
     //schema omitted
     static referencedClasses = [Country]
 }

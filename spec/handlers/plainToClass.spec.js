@@ -1,10 +1,10 @@
 /* global jasmine describe it beforeEach expect spyOn */
-const JSONWrapper = require( "../../" )
+const JsonWrapper = require( "../../" )
 const fs = require( "fs" )
 const path = require( "path" )
 const Fake = require( "../fixtures/util/fake.js" )
 
-class Pair extends JSONWrapper {
+class Pair extends JsonWrapper {
 
     static schema = {
         "id" : "Pair",
@@ -24,8 +24,9 @@ class Pair extends JSONWrapper {
     }
 }
 
-class Letter extends JSONWrapper {
+class Letter extends JsonWrapper {
 
+ 
     static schema = {
         "id" : "Letter",
         "type" : "object",
@@ -41,7 +42,7 @@ class Letter extends JSONWrapper {
     }
 }
 
-class Credential extends JSONWrapper {
+class Credential extends JsonWrapper {
 
     static schema = {
         "id" : "Credential",
@@ -79,7 +80,7 @@ class Credential extends JSONWrapper {
     }
 }
 
-class User extends JSONWrapper {
+class User extends JsonWrapper {
 
     static schema = {
         "id" : "User",
@@ -129,7 +130,7 @@ class User extends JSONWrapper {
 
 }
 
-class Product extends JSONWrapper {
+class Product extends JsonWrapper {
     static schema = {
         "id" : "Product",
         "type" : "object",
@@ -142,7 +143,7 @@ class Product extends JSONWrapper {
     uid = "98765"
 }
 
-class Door extends JSONWrapper {
+class Door extends JsonWrapper {
     static schema = {
         "id" : "Door",
         "type" : "object",
@@ -156,7 +157,7 @@ class Door extends JSONWrapper {
     }
 }
 
-class House extends JSONWrapper {
+class House extends JsonWrapper {
     static schema = {
         "id" : "House",
         "type" : "object",
@@ -170,7 +171,7 @@ class House extends JSONWrapper {
 }
 
 
-class Recursive extends JSONWrapper {
+class Recursive extends JsonWrapper {
 
     static schema = {
         "id" : "Recursive",

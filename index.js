@@ -1,3 +1,3 @@
-const JSONWrapper = require( "./classes" )
+const JsonWrapper = require( "./classes" )
 
-module.exports = JSONWrapper
+module.exports = JsonWrapper

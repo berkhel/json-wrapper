@@ -13,13 +13,13 @@ const traverse = require( "traverse" )
  *  and then expose methods in the child class in order to add behavior to a json object.
  * It must be possible to call, without arguments, the constructor of the child class, without throwing any exception.
  * This constraint apply also to the classes of the nested objects of the child class.
- * Although not mandatory, it is recommended that nested objects also extend JSONWrapper.
+ * Although not mandatory, it is recommended that nested objects also extend JsonWrapper.
  * static schema field is mandatory and it must be a valid json schema (see {@link https://json-schema.org | Json-Schema}).
  * If you want to reference other classes with "$ref" (nested usage) is mandatory to include
  *  in the static referencedClasses field all the referenced classes
  *
  * @example //simple usage
- * class User extends JSONWrapper {
+ * class User extends JsonWrapper {
  *  static schema = {"type" : "object", "properties" : {
  *   "first_name" : {"type":"string"},
  *   "last_name" : {"type":"string"}}}
@@ -31,16 +31,16 @@ const traverse = require( "traverse" )
  * console.log(aUser.getFullname()) //prints "John Doe"
  *
  * @example //nested usage
- * class App extends JSONWrapper {
+ * class App extends JsonWrapper {
  *      static schema = {"type":"object","properties":{
  * "users":{"type":"array","items":{"$ref":"User"}}}}
  *      static referencedClasses = [User]
  * }
- * class User extends JSONWrapper {
+ * class User extends JsonWrapper {
  * static schema = {"type":"object","properties":{"country":{"$ref":"Country"}}}
  *     static referencedClasses = [Country]
  * }
- * class Country extends JSONWrapper {
+ * class Country extends JsonWrapper {
  * static schema = {"type" :"object","properties":{"language":{"type":"string"},"code":{"type":"string"}}}
  *      get locale() {
  *          return this.language + "_" + this.code
@@ -57,7 +57,7 @@ const traverse = require( "traverse" )
  * console.log(app.users[0].country.locale) //prints "it_IT"
  *
  * @example //constructor that doesn't respect the contract
- * class User extends JSONWrapper {
+ * class User extends JsonWrapper {
  * //schema and classReferenced omitted
  *      constructor(name) {
  *          super();
@@ -67,7 +67,7 @@ const traverse = require( "traverse" )
  * }
  *
  * @example //class that doesn't respect the contract due to the nested object constructor
- * class User extends JSONWrapper {
+ * class User extends JsonWrapper {
  * //schema omitted
  * static referencedClasses = [Country]
  * }
@@ -79,7 +79,7 @@ const traverse = require( "traverse" )
  * }
  *
  */
-class JSONWrapper {
+class JsonWrapper {
 
     /**
      * the json schema that every instance of this class must follow
@@ -94,14 +94,14 @@ class JSONWrapper {
     static referencedClasses = []
 
     static {
-        JSONWrapper.#configureGenerator()
+        JsonWrapper.#configureGenerator()
     }
 
 
     /**
      * Factory method
      * @param {string} json - a json string compatible with {@link schema}
-     * @return {JSONWrapper} an instance of the class from which this method is called
+     * @return {JsonWrapper} an instance of the class from which this method is called
      */
     static fromJsonString( json ) {
         return this.fromJsonObject( JSON.parse( json ) )
@@ -110,10 +110,10 @@ class JSONWrapper {
     /**
      * Factory method
      * @param {string} jsonObj - a json object compatible with {@link schema}
-     * @return {JSONWrapper} an instance of the class from which this method is called
+     * @return {JsonWrapper} an instance of the class from which this method is called
      */
     static fromJsonObject( jsonObj ) {
-        return _.mergeWith( this.minimalObject( jsonObj ), jsonObj, JSONWrapper.#handleObjects )
+        return _.mergeWith( this.minimalObject( jsonObj ), jsonObj, JsonWrapper.#handleObjects )
     }
 
     /**
@@ -133,17 +133,17 @@ class JSONWrapper {
 
     /**
      * @private
-     * @param {Object} classObjNode - object at some point in the state structure of the JSONWrapper object
+     * @param {Object} classObjNode - object at some point in the state structure of the JsonWrapper object
      * @param {Object} jsonObjNode - corresponding object of {@link classObjNode} in the json object
      * @return {(Object | Array | undefined)}
      */
     static #handleObjects( classObjNode, jsonObjNode ) {
-        if ( classObjNode instanceof JSONWrapper ) {
+        if ( classObjNode instanceof JsonWrapper ) {
             return classObjNode.constructor.fromJsonObject( jsonObjNode )
         }
         if ( _.isArray( classObjNode ) && _.isArray( jsonObjNode ) ) {
             return jsonObjNode.map( ( jsonObjNodeElem ) =>
-                JSONWrapper.#handleObjects( classObjNode[0], jsonObjNodeElem ) )
+                JsonWrapper.#handleObjects( classObjNode[0], jsonObjNodeElem ) )
         }
     }
 
@@ -167,6 +167,38 @@ class JSONWrapper {
     }
 
     /**
+     * Generate an instance of JsonWrapper with only one element for each array
+     * The $ref tags in the schema are converted to $class tags and then to instances of classes
+     * @param {object} jsonObject 
+     * @returns {JsonWrapper} 
+     */
+    static minimalObject( jsonObject ) {
+        const tipify = ( object, withClass ) => {
+            return _.merge( new withClass.prototype.constructor(), object )
+        }
+
+        function deleteBecauseAbsentInJsonObject() {
+            if ( !traverse( jsonObject ).has( this.path ) ) {
+                this.delete()
+                return true
+            }
+        }
+
+
+        let that = this
+        function $classMarkersToClassInstances( node ) {
+            if ( !deleteBecauseAbsentInJsonObject.apply( this ) && _.isObject( node ) && Reflect.has( node, "$class" ) ) {
+                const foundClass = that.referencedClasses.find( cls => cls.name === node["$class"] )
+                delete node.$class
+                return foundClass ? tipify( node, foundClass ) : node
+            }
+        }
+
+        return tipify( traverse( JsonGenerator.generate( this.$classMarkedSchema ) ).map( $classMarkersToClassInstances ), this )
+    }
+
+
+    /**
      * $ref tags are mapped to $class tags in order to be handled by {@link minimalObject}
      */
     static get $classMarkedSchema() {
@@ -184,39 +216,6 @@ class JSONWrapper {
         }
         return this._markedSchema
     }
-
-
-    /**
-     * Generate an instance of JSONWrapper with only one element for each array
-     * The $ref tags in the schema are converted to $class tags and then to instances of classes
-     * @param {object} jsonObject 
-     * @returns {JSONWrapper} 
-     */
-    static minimalObject( jsonObject ) {
-
-        const tipify = ( object, withClass ) => {
-            return _.merge( new withClass.prototype.constructor(), object )
-        }
-
-        function isUsedInJsonObject() {
-            if ( !traverse( jsonObject ).has( this.path ) ) {
-                this.delete()
-            } else {
-                return true
-            }
-        }
-
-        let that = this
-        function $classMarkersToClassInstances( node ) {
-            if ( isUsedInJsonObject.apply( this ) && _.isObject( node ) && Reflect.has( node, "$class" ) ) {
-                const foundClass = that.referencedClasses.find( cls => cls.name === node["$class"] )
-                delete node.$class
-                return foundClass ? tipify( node, foundClass ) : node
-            }
-        }
-
-        return tipify( traverse( JsonGenerator.generate( this.$classMarkedSchema ) ).map( $classMarkersToClassInstances ), this )
-    }
 }
 
-module.exports = JSONWrapper
+module.exports = JsonWrapper

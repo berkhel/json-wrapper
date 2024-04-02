@@ -1,5 +1,5 @@
 /* eslint-disable no-undef */
-class User extends JSONWrapper {
+class User extends JsonWrapper {
     static schema = {
         "id" : "User",
         "type" : "object",
