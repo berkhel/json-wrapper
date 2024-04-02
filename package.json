@@ -17,6 +17,10 @@
     "type": "git",
     "url": "https://github.com/berkhel/json-wrapper.git"
   },
+   "engines" : { 
+    "npm" : ">=8.0.0",
+    "node" : ">=16.0.0"
+  },
   "dependencies": {
     "json-schema-faker": "^0.5.6",
     "lodash": "^4.17.21",
