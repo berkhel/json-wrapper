@@ -111,6 +111,7 @@ console.log( app.users[0].country.locale ) //prints "it_IT"
 
 [,javascript]
 ----
+/* DON'T DO THIS */
 class Account extends JsonWrapper {
     //schema and classReferenced omitted
     constructor( name ) { // new Account() not callable !
