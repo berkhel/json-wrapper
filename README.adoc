@@ -107,7 +107,7 @@ let app = App.fromJsonString( `{
 console.log( app.users[0].country.locale ) //prints "it_IT"
 ---- 
 
-=== Constructors that doesn't respect the contract
+=== Constructors that don't respect the contract
 
 [,javascript]
 ----
